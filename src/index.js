@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+
 function Square({value, onClick, background}) {
     return (
         <button className="square" onClick={() => onClick()} style={background}>
@@ -9,7 +10,7 @@ function Square({value, onClick, background}) {
         </button>
     );
 }
-  
+
 class Board extends React.Component {
     renderSquare(i) {
         let background = {background: "white"};
@@ -46,11 +47,12 @@ class Board extends React.Component {
 }
   
 class Game extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
             history: [{
-                squares: Array(9).fill(null),
+                squares: Array(this.props.SizeBoard * this.props.SizeBoard).fill(null),
                 location: {col: null, row: null},
             }],
             stepNumber: 0,
@@ -64,14 +66,14 @@ class Game extends React.Component {
         const current = history[history.length - 1];
         const squares = current.squares.slice();
 
-        if (calculateWinner(squares) || squares[i]) {
+        if (calculateWinner(squares, this.props.SizeBoard) || squares[i]) {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
         this.setState({
             history: history.concat([{
                 squares: squares,
-                location: {col: (i % 3) + 1, row: Math.floor(i / 3) + 1 }
+                location: {col: (i % this.props.SizeBoard) + 1, row: Math.floor(i / this.props.SizeBoard) + 1 }
             }]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
@@ -94,12 +96,12 @@ class Game extends React.Component {
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
-        const winner = calculateWinner(current.squares);
+        const winner = calculateWinner(current.squares, this.props.SizeBoard);
 
         const moves = history.map((step, move) => {
             const desc = move ?
                 'Go to move #' + move + " (" + step.location.col + ", " + step.location.row + ")":
-                'Go to game start (col: null, row: null)';
+                'Go to game start';
             
             if(move === this.state.stepNumber)
             {
@@ -155,8 +157,8 @@ class Game extends React.Component {
                     <Board
                         squares={current.squares}
                         onClick={(i) => this.handleClick(i)}
-                        rowNumber={3}
-                        colNumber={3}
+                        rowNumber={this.props.SizeBoard}
+                        colNumber={this.props.SizeBoard}
                         causeWin = {causeWin}
                     />
                 </div>
@@ -173,25 +175,224 @@ class Game extends React.Component {
   // ========================================
   
 ReactDOM.render(
-    <Game />,
+    <Game SizeBoard={3}/>,
     document.getElementById('root')
 );
 
-function calculateWinner(squares) {
-    const lines = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
-    ];
-    for (let i = 0; i < lines.length; i++) {
-        const [a, b, c] = lines[i];
-        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-            return {player: squares[a], cause: [a, b, c]};
+function calculateWinner(squares, SizeBoard) {
+    if(SizeBoard === 1)
+    {
+        if(squares[0])
+            return {player: squares[0], cause: [0]};
+        else
+            return null;
+    }
+
+    let winSquareNumber;
+    if(SizeBoard <= 5)
+        winSquareNumber = SizeBoard;
+    else
+        winSquareNumber = 5;
+    
+    //Check in row
+    for(let row = 0; row < SizeBoard; row++)
+    {
+        for(let col = 0; col <= (SizeBoard - winSquareNumber); col++)
+        {
+            if(squares[row * SizeBoard + col])
+            {
+                let count = 1;
+                let causeWin = [];
+                causeWin.push(row * SizeBoard + col);
+
+                for(let nextCol = col + 1; nextCol < SizeBoard; nextCol++)
+                {
+
+                    if(squares[row * SizeBoard + col] === squares[row * SizeBoard + nextCol])
+                    {
+                        count++;
+                        causeWin.push(row * SizeBoard + nextCol);
+
+                        if(count === winSquareNumber)
+                        {
+                            return {player: squares[row * SizeBoard + col], cause: causeWin};
+                        }
+                    }
+                    else
+                    {
+                        col = nextCol - 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //Check in column
+    for(let col = 0; col < SizeBoard; col++)
+    {
+        for(let row = 0; row <= (SizeBoard - winSquareNumber); row++)
+        {
+            if(squares[row * SizeBoard + col])
+            {
+                let count = 1;
+                let causeWin = [];
+                causeWin.push(row * SizeBoard + col);
+
+                for(let nextRow = row + 1; nextRow < SizeBoard; nextRow++)
+                {
+
+                    if(squares[row * SizeBoard + col] === squares[nextRow * SizeBoard + col])
+                    {
+                        count++;
+                        causeWin.push(nextRow * SizeBoard + col);
+
+                        if(count === winSquareNumber)
+                        {
+                            return {player: squares[row * SizeBoard + col], cause: causeWin};
+                        }
+                    }
+                    else
+                    {
+                        row = nextRow - 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //Check in diagonal (left to right)
+   
+    for(let col = 0; col <= (SizeBoard - winSquareNumber); col++)
+    {
+        for(let row = 0; row <= (SizeBoard - winSquareNumber - col); row++)
+        {
+            if(squares[row * SizeBoard + col + row])
+            {
+                let count = 1;
+                let causeWin = [];
+                causeWin.push(row * SizeBoard + col + row);
+
+                for(let nextRow = row + 1; nextRow < SizeBoard; nextRow++)
+                {
+                    if(squares[row * SizeBoard + col + row] === squares[nextRow * SizeBoard + col + nextRow])
+                    {
+                        count++;
+                        causeWin.push(nextRow * SizeBoard + col + nextRow);
+
+                        if(count === winSquareNumber)
+                        {
+                            return {player: squares[row * SizeBoard + col + row], cause: causeWin};
+                        }
+                    }
+                    else
+                    {
+                        row = nextRow - 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    for(let row = 0; row <= (SizeBoard - winSquareNumber); row++)
+    {
+        for(let col = 0; col <= (SizeBoard - winSquareNumber - row); col++)
+        {
+            if(squares[row * SizeBoard + col * SizeBoard + col])
+            {
+                let count = 1;
+                let causeWin = [];
+                causeWin.push(row * SizeBoard + col * SizeBoard + col);
+
+                for(let nextCol = col + 1; nextCol < SizeBoard; nextCol++)
+                {
+
+                    if(squares[row * SizeBoard + col * SizeBoard + col] === squares[row * SizeBoard + nextCol * SizeBoard + nextCol])
+                    {
+                        count++;
+                        causeWin.push(row * SizeBoard + nextCol * SizeBoard + nextCol);
+
+                        if(count === winSquareNumber)
+                        {
+                            return {player: squares[row * SizeBoard + col * SizeBoard + col], cause: causeWin};
+                        }
+                    }
+                    else
+                    {
+                        col = nextCol - 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //Check in diagonal (right to left)
+   
+    for(let col = SizeBoard - 1; col >= winSquareNumber - 1; col--)
+    {
+        for(let row = 0; row <= (SizeBoard - winSquareNumber + col - (SizeBoard - 1)); row++)
+        {
+            if(squares[row * SizeBoard + col - row])
+            {
+                let count = 1;
+                let causeWin = [];
+                causeWin.push(row * SizeBoard + col - row);
+
+                for(let nextRow = row + 1; nextRow < SizeBoard; nextRow++)
+                {
+                    if(squares[row * SizeBoard + col - row] === squares[nextRow * SizeBoard + col - nextRow])
+                    {
+                        count++;
+                        causeWin.push(nextRow * SizeBoard + col - nextRow);
+
+                        if(count === winSquareNumber)
+                        {
+                            return {player: squares[row * SizeBoard + col - row], cause: causeWin};
+                        }
+                    }
+                    else
+                    {
+                        row = nextRow - 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    for(let row = 0; row <= (SizeBoard - winSquareNumber); row++)
+    {
+        for(let col = SizeBoard - 1; col >= winSquareNumber - 1 + row; col--)
+        {
+            if(squares[row * SizeBoard + (SizeBoard - 1 - col) * SizeBoard + col])
+            {
+                let count = 1;
+                let causeWin = [];
+                causeWin.push(row * SizeBoard + (SizeBoard - 1 - col) * SizeBoard + col);
+
+                for(let nextCol = col - 1; nextCol >= 0; nextCol--)
+                {
+
+                    if(squares[row * SizeBoard + (SizeBoard - 1 - col) * SizeBoard + col] === squares[row * SizeBoard + (SizeBoard - 1 - nextCol) * SizeBoard + nextCol])
+                    {
+                        count++;
+                        causeWin.push(row * SizeBoard + (SizeBoard - 1 - nextCol) * SizeBoard + nextCol);
+
+                        if(count === winSquareNumber)
+                        {
+                            return {player: squares[row * SizeBoard + (SizeBoard - 1 - col) * SizeBoard + col], cause: causeWin};
+                        }
+                    }
+                    else
+                    {
+                        col = nextCol + 1;
+                        break;
+                    }
+                }
+            }
         }
     }
     return null;
