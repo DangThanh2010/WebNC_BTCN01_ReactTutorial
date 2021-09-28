@@ -48,4 +48,9 @@ body {
   .game-info {
     margin-left: 20px;
   }
+
+  .input-size-board {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
   

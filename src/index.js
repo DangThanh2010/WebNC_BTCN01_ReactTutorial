@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-
 function Square({value, onClick, background}) {
     return (
         <button className="square" onClick={() => onClick()} style={background}>
@@ -52,11 +51,12 @@ class Game extends React.Component {
         super(props);
         this.state = {
             history: [{
-                squares: Array(this.props.SizeBoard * this.props.SizeBoard).fill(null),
+                squares: Array(3 * 3).fill(null),
                 location: {col: null, row: null},
             }],
             stepNumber: 0,
             IsAscending: true,
+            SizeBoard: 3,
             xIsNext: true,
         };
     }
@@ -66,14 +66,14 @@ class Game extends React.Component {
         const current = history[history.length - 1];
         const squares = current.squares.slice();
 
-        if (calculateWinner(squares, this.props.SizeBoard) || squares[i]) {
+        if (calculateWinner(squares, this.state.SizeBoard) || squares[i]) {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
         this.setState({
             history: history.concat([{
                 squares: squares,
-                location: {col: (i % this.props.SizeBoard) + 1, row: Math.floor(i / this.props.SizeBoard) + 1 }
+                location: {col: (i % this.state.SizeBoard) + 1, row: Math.floor(i / this.state.SizeBoard) + 1 }
             }]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
@@ -93,10 +93,40 @@ class Game extends React.Component {
         })
     }
 
+    changeSizeBoard(event)
+    {
+        if(event.target.value !== null && event.target.value !== "" && event.target.value !== undefined)
+        {
+            this.setState({
+                history: [{
+                    squares: Array(parseInt(event.target.value) * parseInt(event.target.value)).fill(null),
+                    location: {col: null, row: null},
+                }],
+                stepNumber: 0,
+                IsAscending: true,
+                SizeBoard: parseInt(event.target.value),
+                xIsNext: true,
+            })
+        }
+        else
+        {
+            this.setState({
+                history: [{
+                    squares: Array(0).fill(null),
+                    location: {col: null, row: null},
+                }],
+                stepNumber: 0,
+                IsAscending: true,
+                SizeBoard: 0,
+                xIsNext: true,
+            })
+        }
+    }
+
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
-        const winner = calculateWinner(current.squares, this.props.SizeBoard);
+        const winner = calculateWinner(current.squares, this.state.SizeBoard);
 
         const moves = history.map((step, move) => {
             const desc = move ?
@@ -157,13 +187,20 @@ class Game extends React.Component {
                     <Board
                         squares={current.squares}
                         onClick={(i) => this.handleClick(i)}
-                        rowNumber={this.props.SizeBoard}
-                        colNumber={this.props.SizeBoard}
+                        rowNumber={this.state.SizeBoard}
+                        colNumber={this.state.SizeBoard}
                         causeWin = {causeWin}
                     />
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
+
+                    <div className="input-size-board">
+                        <label for="sizeboard">Size of board: </label>
+                        <input type="number" id="sizeboard" name="sizeboard" min="1"
+                            value={this.state.SizeBoard ? this.state.SizeBoard : null} step="1" onChange={(event) => this.changeSizeBoard(event)}/>
+                    </div>
+
                     <button onClick={() => this.toggle()}>Sort in {sortOrder} order</button>
                     <ol>{moves}</ol>
                 </div>
@@ -175,11 +212,14 @@ class Game extends React.Component {
   // ========================================
   
 ReactDOM.render(
-    <Game SizeBoard={3}/>,
+    <Game />,
     document.getElementById('root')
 );
 
 function calculateWinner(squares, SizeBoard) {
+    if(SizeBoard < 1)
+        return null;
+        
     if(SizeBoard === 1)
     {
         if(squares[0])
