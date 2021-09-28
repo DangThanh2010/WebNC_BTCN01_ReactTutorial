@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/WebNC_BTCN01_ReactTutorial/static/css/main.d16098b0.chunk.css",
-    "main.js": "/WebNC_BTCN01_ReactTutorial/static/js/main.dfd3a311.chunk.js",
-    "main.js.map": "/WebNC_BTCN01_ReactTutorial/static/js/main.dfd3a311.chunk.js.map",
+    "main.css": "/WebNC_BTCN01_ReactTutorial/static/css/main.6b4310d4.chunk.css",
+    "main.js": "/WebNC_BTCN01_ReactTutorial/static/js/main.e08dc864.chunk.js",
+    "main.js.map": "/WebNC_BTCN01_ReactTutorial/static/js/main.e08dc864.chunk.js.map",
     "runtime-main.js": "/WebNC_BTCN01_ReactTutorial/static/js/runtime-main.43fd0543.js",
     "runtime-main.js.map": "/WebNC_BTCN01_ReactTutorial/static/js/runtime-main.43fd0543.js.map",
     "static/js/2.b09df62c.chunk.js": "/WebNC_BTCN01_ReactTutorial/static/js/2.b09df62c.chunk.js",
     "static/js/2.b09df62c.chunk.js.map": "/WebNC_BTCN01_ReactTutorial/static/js/2.b09df62c.chunk.js.map",
     "index.html": "/WebNC_BTCN01_ReactTutorial/index.html",
-    "static/css/main.d16098b0.chunk.css.map": "/WebNC_BTCN01_ReactTutorial/static/css/main.d16098b0.chunk.css.map",
+    "static/css/main.6b4310d4.chunk.css.map": "/WebNC_BTCN01_ReactTutorial/static/css/main.6b4310d4.chunk.css.map",
     "static/js/2.b09df62c.chunk.js.LICENSE.txt": "/WebNC_BTCN01_ReactTutorial/static/js/2.b09df62c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.43fd0543.js",
     "static/js/2.b09df62c.chunk.js",
-    "static/css/main.d16098b0.chunk.css",
-    "static/js/main.dfd3a311.chunk.js"
+    "static/css/main.6b4310d4.chunk.css",
+    "static/js/main.e08dc864.chunk.js"
   ]
 }
